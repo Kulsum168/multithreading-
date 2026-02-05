@@ -1,0 +1,27 @@
+#include <pthread.h>
+#include <stdio.h>
+#include <semaphore.h>
+#include <unistd.h>
+sem_t s;
+void* receiver(void* arg){
+printf("waiting...\n");
+sem_wait(&s);
+printf("received!\n");
+return NULL;
+}
+void* sender(void* arg){
+sleep(1);
+printf("signaling...\n");
+sem_post(&s);
+return NULL;
+}
+int main(){
+pthread_t t1,t2;
+sem_init(&s,0,0);
+pthread_create(&t1,NULL,receiver,NULL);
+pthread_create(&t2,NULL,sender,NULL);
+pthread_join(t1,NULL);
+pthread_join(t2,NULL);
+sem_destroy(&s);
+return 0;
+}
