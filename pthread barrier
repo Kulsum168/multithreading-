@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+
+pthread_barrier_t b;
+
+void* routine(void* arg){
+char* name=(char*)arg;
+printf("%s: ready\n",name);
+sleep(1);
+pthread_barrier_wait(&b);
+printf("%s: passed\n",name);
+return NULL;
+}
+
+int main(){
+pthread_t t1,t2,t3;
+pthread_barrier_init(&b,NULL,3);
+pthread_create(&t1,NULL,routine,"T1");
+pthread_create(&t2,NULL,routine,"T2");
+pthread_create(&t3,NULL,routine,"T3");
+pthread_join(t1,NULL);
+pthread_join(t2,NULL);
+pthread_join(t3,NULL);
+pthread_barrier_destroy(&b);
+return 0;
+}
