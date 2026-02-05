@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+
+int main() {
+    int p2c[2], c2p[2];
+    char buf[100];
+    pipe(p2c);
+    pipe(c2p);
+    if (fork() == 0) {
+        close(p2c[1]);
+        close(c2p[0]);
+        read(p2c[0], buf, 100);
+        printf("Child: %s\n", buf);
+        write(c2p[1], "Understood", 11);
+        close(p2c[0]);
+        close(c2p[1]);
+    } else {
+        close(p2c[0]);
+        close(c2p[1]);
+        write(p2c[1], "Go to sleep", 12);
+        read(c2p[0], buf, 100);
+        printf("Parent: %s\n", buf);
+        close(p2c[1]);
+        close(c2p[0]);
+        wait(NULL);
+    }
+    return 0;
+}
